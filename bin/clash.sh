@@ -43,5 +43,9 @@ done
 
 cd $WORKDIR
 message="安装路径：$HOME/.local/bin/clash
-配置文件路径：$HOME/.config/clash"
+配置文件路径：$HOME/.config/clash
+启动clash：clash_start
+关闭clash：clash_stop
+打开代理：proxy_on
+关闭代理：proxy_off"
 print 0 "$message"

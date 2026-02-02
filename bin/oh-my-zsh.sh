@@ -42,7 +42,7 @@ clone_plugin() {
     if [ -d "$DEST_DIR" ] && [ "$(ls -A $DEST_DIR)" ]; then
         rm -rf $DEST_DIR
     fi
-    git clone --depth=1 $REPO_URL $DEST_DIR > /dev/null
+    git clone --depth=1 $REPO_URL $DEST_DIR
 }
 
 ZSH_CUSTOM=$HOME/.oh-my-zsh/custom
