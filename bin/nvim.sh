@@ -61,4 +61,4 @@ cp "$ROOT_DIR/config/nvim/init.lua" "$HOME/.config/nvim"
 
 message="安装目录：/usr/local/bin/nvim
 配置文件：$HOME/.config/nvim/init.lua"
-print 0 $message
+print 0 "$message"
