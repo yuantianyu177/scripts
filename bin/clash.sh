@@ -41,6 +41,15 @@ for rc in ~/.bashrc ~/.zshrc; do
     fi
 done
 
+# 安装clash-dashboard
+DIR="$HOME/.config/clash"
+rm -rf $DIR/clash-dashboard
+git clone https://github.com/eorendel/clash-dashboard.git $DIR/clash-dashboard
+sed -i '/^secret:/d' $DIR/config.yaml
+sed -i '/^external-ui:/d' $DIR/config.yaml
+sed -i '/^external-controller:/d' $DIR/config.yaml
+sed -i "6i external-controller: 127.0.0.1:9090\nsecret: \"yty&123\"\nexternal-ui: $DIR/clash-dashboard" $DIR/config.yaml
+
 cd $WORKDIR
 message="安装路径：$HOME/.local/bin/clash
 配置文件路径：$HOME/.config/clash
