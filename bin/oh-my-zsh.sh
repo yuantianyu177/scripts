@@ -10,11 +10,14 @@ if ! command_exist zsh; then
     install_pkg zsh > /dev/null
 fi
 
+echo "安装oh-my-zsh..."
 RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 cp "$ROOT_DIR/config/oh-my-zsh/.zshrc" "$HOME/.zshrc"
+cp "$ROOT_DIR/config/oh-my-zsh/aliases.zsh" "$HOME/.oh-my-zsh/custom/"
 
 # 安装插件
+echo "安装插件..."
 if [[ "$(uname)" == "Darwin" ]]; then
     SED_CMD="sed -i ''"
 else
@@ -39,7 +42,7 @@ clone_plugin() {
     if [ -d "$DEST_DIR" ] && [ "$(ls -A $DEST_DIR)" ]; then
         rm -rf $DEST_DIR
     fi
-    git clone --depth=1 $REPO_URL $DEST_DIR
+    git clone --depth=1 $REPO_URL $DEST_DIR > /dev/null
 }
 
 ZSH_CUSTOM=$HOME/.oh-my-zsh/custom
