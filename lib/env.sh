@@ -39,3 +39,31 @@ install_pkg() {
   fi
 }
 
+get_login_shell_rc_file() {
+  local shell_name rc_file
+
+  shell_name=$(basename "$SHELL")
+
+  case "$shell_name" in
+    bash)
+      rc_file="$HOME/.bashrc"
+      ;;
+    zsh)
+      rc_file="$HOME/.zshrc"
+      ;;
+    ksh)
+      rc_file="$HOME/.kshrc"
+      ;;
+    fish)
+      rc_file="$HOME/.config/fish/config.fish"
+      ;;
+    sh|dash)
+      rc_file="$HOME/.profile"
+      ;;
+    *)
+      rc_file="$HOME/.profile"
+      ;;
+  esac
+
+  echo "$rc_file"
+}
