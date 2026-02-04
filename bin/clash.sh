@@ -27,7 +27,7 @@ git config --global https.proxy 'https://127.0.0.1:7890'
 CONTENT=$(cat <<EOL
 # clash
 alias clash_start="tmux new-session -d -s clash $HOME/.local/bin/clash -d $HOME/.config/clash"
-alias clash_stop='tmux kill-session -t clash'
+alias clash_stop='pkill clash'
 alias proxy_on='export https_proxy=http://127.0.0.1:7890 http_proxy=http://127.0.0.1:7890 all_proxy=socks5://127.0.0.1:7890'
 alias proxy_off='unset http_proxy https_proxy'
 EOL
