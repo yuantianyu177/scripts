@@ -8,11 +8,11 @@ command_exists() {
 install_pkg() {
   local pkg=$1
   if [ -z "$pkg" ]; then
-    echo "请提供软件名"
+    echo "Please provide a package name"
     return 1
   fi
 
-  # 检测发行版
+  # Detect distribution
   if [ -f /etc/os-release ]; then
     . /etc/os-release
     case "$ID" in
@@ -29,12 +29,12 @@ install_pkg() {
         sudo pacman -S --noconfirm "$pkg"
         ;;
       *)
-        echo "不支持的系统: $ID"
+        echo "Unsupported OS: $ID"
         return 1
         ;;
     esac
   else
-    echo "无法检测系统类型"
+    echo "Unable to detect OS type"
     return 1
   fi
 }

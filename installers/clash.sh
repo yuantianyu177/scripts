@@ -6,17 +6,18 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$ROOT_DIR/lib/log.sh"
 WORKDIR=$PWD
 
-# Download clash 
+# Download clash
 cd /tmp
-mkdir -p $HOME/.local/bin
+mkdir -p "$HOME/.local/bin"
 wget "https://kflxc.big-files.make-w0rld-static.club:8000/file/ikuuu-static-release/clash-linux/clash-linux-1.0.1/clash-linux-amd64.gz" -O clash-linux-amd64.gz;
 gzip -d clash-linux-amd64.gz
 chmod +x clash-linux-amd64
-mv clash-linux-amd64 $HOME/.local/bin/clash
+mv clash-linux-amd64 "$HOME/.local/bin/clash"
 
 # Download config
-mkdir -p $HOME/.config/clash && cd $HOME/.config/clash
-wget -O config.yaml "https://hjvh8.no-mad-world.club/link/HsHy1jgixpUySi3c?clash=3"
+read -p "Enter clash config URL: " CONFIG_URL
+mkdir -p "$HOME/.config/clash" && cd "$HOME/.config/clash"
+wget -O config.yaml "$CONFIG_URL"
 
 # Config git
 git config --global http.proxy 'http://127.0.0.1:7890'
@@ -39,20 +40,20 @@ for rc in ~/.bashrc ~/.zshrc; do
     fi
 done
 
-# install clash-dashboard
+# Install clash-dashboard
 DIR="$HOME/.config/clash"
-rm -rf $DIR/clash-dashboard
-git clone https://github.com/eorendel/clash-dashboard.git $DIR/clash-dashboard
-sed -i '/^secret:/d' $DIR/config.yaml
-sed -i '/^external-ui:/d' $DIR/config.yaml
-sed -i '/^external-controller:/d' $DIR/config.yaml
-sed -i "6i external-controller: 127.0.0.1:9090\nsecret: \"yty&123\"\nexternal-ui: $DIR/clash-dashboard" $DIR/config.yaml
+rm -rf "$DIR/clash-dashboard"
+git clone https://github.com/eorendel/clash-dashboard.git "$DIR/clash-dashboard"
+sed -i '/^secret:/d' "$DIR/config.yaml"
+sed -i '/^external-ui:/d' "$DIR/config.yaml"
+sed -i '/^external-controller:/d' "$DIR/config.yaml"
+sed -i "6i external-controller: 127.0.0.1:9090\nsecret: \"yty&123\"\nexternal-ui: $DIR/clash-dashboard" "$DIR/config.yaml"
 
-cd $WORKDIR
-message="安装路径：$HOME/.local/bin/clash
-配置文件路径：$HOME/.config/clash
-启动clash：clash_start
-关闭clash：clash_stop
-打开代理：proxy_on
-关闭代理：proxy_off"
+cd "$WORKDIR"
+message="Install path: $HOME/.local/bin/clash
+Config path: $HOME/.config/clash
+Start clash: clash_start
+Stop clash: clash_stop
+Enable proxy: proxy_on
+Disable proxy: proxy_off"
 print 0 "$message"

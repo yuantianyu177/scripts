@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-                
+
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$ROOT_DIR/lib/log.sh"
 source "$ROOT_DIR/lib/env.sh"
@@ -28,18 +28,18 @@ fi
 BASE_URL="https://mirrors.nju.edu.cn/anaconda/miniconda/"
 INSTALLER="Miniconda3-latest-$OS-$ARCH_TYPE.sh"
 
-# 下载并安装 Miniconda
+# Download and install Miniconda
 wget "${BASE_URL}${INSTALLER}" -O conda.sh
 bash conda.sh -b -u -p "$HOME/.local/share/miniconda3" && rm conda.sh
 
-# 更新 shell 配置文件
+# Update shell config file
 RC_FILE=$(get_login_shell_rc_file)
 content='# miniconda3
 export PATH="$HOME/.local/share/miniconda3/bin:$PATH"
 source "$HOME/.local/share/miniconda3/bin/activate"'
 append_if_not_exists "$content" "$RC_FILE"
 
-# 配置 Conda 镜像源
+# Configure Conda mirror sources
 cat <<EOF > "$HOME/.condarc"
 channels:
   - defaults
@@ -53,7 +53,7 @@ custom_channels:
   pytorch: https://mirror.nju.edu.cn/anaconda/cloud
 EOF
 
-message="安装路径：$HOME/.local/share/miniconda3
-已更新"$RC_FILE"
-已更新镜像源$HOME/.condarc"
+message="Install path: $HOME/.local/share/miniconda3
+Updated $RC_FILE
+Updated mirror sources: $HOME/.condarc"
 print 0 "$message"

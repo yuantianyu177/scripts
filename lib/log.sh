@@ -3,10 +3,9 @@
 [[ -n "${__LOG_SH__:-}" ]] && return
 __LOG_SH__=1
 
-# 依赖 color
 source "$(dirname "${BASH_SOURCE[0]}")/color.sh"
 
-# 计算行显示宽度（中文算两格）
+# Calculate display width of a string (CJK characters count as 2)
 strwidth() {
   awk -v s="$1" 'BEGIN {
     w=0;
@@ -31,7 +30,7 @@ print() {
     color="$RED"
   fi
 
-  # 计算最长行显示宽度
+  # Find the longest line display width
   local max_len=0
   while IFS= read -r line; do
     local w
@@ -39,16 +38,15 @@ print() {
     (( w > max_len )) && max_len=$w
   done <<< "$message"
 
-  # 打印边框
+  # Print border
   local border
   border=$(printf '%*s' "$max_len" '' | tr ' ' '=')
   echo -e "${color}${border}${COLOR_RESET}"
 
-  # 打印内容
+  # Print content
   while IFS= read -r line; do
     echo -e "${color}${line}${COLOR_RESET}"
   done <<< "$message"
 
   echo -e "${color}${border}${COLOR_RESET}"
 }
-

@@ -7,8 +7,7 @@ append_if_not_exists() {
 
   [[ -z "$content" ]] && return
   [[ ! -f "$file" ]] && return
-  # 判断文件中是否已经包含完全一样的内容
-  # 用 grep -F -x -q 支持多行匹配需特殊处理
+  # Check if the file already contains the exact same content
   if grep -Fxq "$content" "$file"; then
     return
   fi

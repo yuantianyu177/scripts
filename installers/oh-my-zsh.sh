@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
-                
+
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$ROOT_DIR/lib/log.sh"
 source "$ROOT_DIR/lib/env.sh"
 
-if ! command_exist zsh; then
-    echo "安装zsh..."
+if ! command_exists zsh; then
+    echo "Installing zsh..."
     install_pkg zsh > /dev/null
 fi
 
-echo "安装oh-my-zsh..."
+echo "Installing oh-my-zsh..."
 RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
-# 安装插件
-echo "安装插件..."
+# Install plugins
+echo "Installing plugins..."
 if [[ "$(uname)" == "Darwin" ]]; then
     SED_CMD="sed -i ''"
 else
@@ -36,10 +36,10 @@ add_zsh_plugin() {
 clone_plugin() {
     local REPO_URL=$1
     local DEST_DIR=$2
-    if [ -d "$DEST_DIR" ] && [ "$(ls -A $DEST_DIR)" ]; then
-        rm -rf $DEST_DIR
+    if [ -d "$DEST_DIR" ] && [ "$(ls -A "$DEST_DIR")" ]; then
+        rm -rf "$DEST_DIR"
     fi
-    git clone --depth=1 $REPO_URL $DEST_DIR
+    git clone --depth=1 "$REPO_URL" "$DEST_DIR"
 }
 
 ZSH_CUSTOM=$HOME/.oh-my-zsh/custom
@@ -52,7 +52,6 @@ add_zsh_plugin "zsh-autosuggestions"
 clone_plugin https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 add_zsh_plugin "zsh-syntax-highlighting"
 
-# 添加其他插件
+# Add other plugins
 add_zsh_plugin "z"
 add_zsh_plugin "extract"
-
