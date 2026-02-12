@@ -25,7 +25,7 @@ fi
 
 echo "计划下载文件: $FILE"
 
-# 精确匹配 .appimage 文件，排除 .zsync
+# 匹配 .appimage 文件，排除 .zsync
 URL=$(curl -s "https://api.github.com/repos/neovim/neovim/releases/latest" \
       | grep -oP '"browser_download_url": "\K[^"]+' \
       | grep "$FILE$")
@@ -39,7 +39,7 @@ if [[ -z "$URL" ]]; then
 fi
 
 if [[ -z "$URL" ]]; then
-    echo "没有获取到 AppImage 下载链接，可能此 release 尚未发布对应文件。"
+    echo "没有获取到 AppImage 下载链接，此 release 尚未发布对应文件。"
     exit 1
 fi
 
@@ -55,10 +55,5 @@ sudo chmod +x /usr/local/bin/nvim
 nvim --version | head -n1
 rm -rf "$TMP"
 
-# 配置文件
-mkdir -p $HOME/.config/nvim
-cp "$ROOT_DIR/config/nvim/init.lua" "$HOME/.config/nvim" 
-
-message="安装目录：/usr/local/bin/nvim
-配置文件：$HOME/.config/nvim/init.lua"
+message="安装目录：/usr/local/bin/nvim"
 print 0 "$message"

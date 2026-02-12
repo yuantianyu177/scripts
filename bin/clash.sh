@@ -2,10 +2,8 @@
 
 set -euo pipefail
 
-# 引入公共库
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$ROOT_DIR/lib/log.sh"
-
 WORKDIR=$PWD
 
 # Download clash 
@@ -41,7 +39,7 @@ for rc in ~/.bashrc ~/.zshrc; do
     fi
 done
 
-# 安装clash-dashboard
+# install clash-dashboard
 DIR="$HOME/.config/clash"
 rm -rf $DIR/clash-dashboard
 git clone https://github.com/eorendel/clash-dashboard.git $DIR/clash-dashboard

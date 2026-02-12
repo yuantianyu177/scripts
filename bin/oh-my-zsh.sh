@@ -13,9 +13,6 @@ fi
 echo "安装oh-my-zsh..."
 RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
-cp "$ROOT_DIR/config/oh-my-zsh/.zshrc" "$HOME/.zshrc"
-cp "$ROOT_DIR/config/oh-my-zsh/aliases.zsh" "$HOME/.oh-my-zsh/custom/"
-
 # 安装插件
 echo "安装插件..."
 if [[ "$(uname)" == "Darwin" ]]; then
