@@ -2,9 +2,11 @@
 
 set -euo pipefail
 
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$ROOT_DIR/lib/log.sh"
+
 SSH_DIR="$HOME/.ssh"
 
-# ---------- Utility functions ----------
 clear_screen() {
   clear
 }
@@ -13,12 +15,15 @@ is_valid_name() {
   [[ "$1" =~ ^[a-zA-Z0-9._-]+$ ]]
 }
 
-# ---------- Step 1: Select algorithm ----------
-while true; do
-  clear_screen
+print_header() {
   echo "=============================="
   echo " SSH Public Key Generator"
   echo "=============================="
+}
+
+while true; do
+  clear_screen
+  print_header
   echo "Select encryption algorithm:"
   echo "1) ed25519"
   echo "2) rsa 4096"
@@ -39,29 +44,26 @@ while true; do
       break
       ;;
     *)
-      echo "Invalid option, please try again..."
+      log_warn "Invalid option, please try again..."
       sleep 1
       ;;
   esac
 done
 
-# ---------- Step 2: Enter username ----------
 while true; do
   clear_screen
-  echo "=============================="
-  echo " SSH Public Key Generator"
-  echo "=============================="
+  print_header
   echo
   read -p "Enter username: " USERNAME
 
   if [ -z "$USERNAME" ]; then
-    echo "Username cannot be empty"
+    log_error "Username cannot be empty"
     sleep 1
     continue
   fi
 
   if ! is_valid_name "$USERNAME"; then
-    echo "Username contains invalid characters"
+    log_error "Username contains invalid characters"
     sleep 1
     continue
   fi
@@ -69,23 +71,20 @@ while true; do
   break
 done
 
-# ---------- Step 3: Enter hostname ----------
 while true; do
   clear_screen
-  echo "=============================="
-  echo " SSH Public Key Generator"
-  echo "=============================="
+  print_header
   echo
   read -p "Enter hostname: " HOSTNAME
 
   if [ -z "$HOSTNAME" ]; then
-    echo "Hostname cannot be empty"
+    log_error "Hostname cannot be empty"
     sleep 1
     continue
   fi
 
   if ! is_valid_name "$HOSTNAME"; then
-    echo "Hostname contains invalid characters"
+    log_error "Hostname contains invalid characters"
     sleep 1
     continue
   fi
@@ -96,7 +95,6 @@ done
 COMMENT="${USERNAME}@${HOSTNAME}"
 KEY_FILE="$SSH_DIR/$KEY_NAME"
 
-# ---------- Step 4: Generate ----------
 clear_screen
 mkdir -p "$SSH_DIR"
 chmod 700 "$SSH_DIR"
@@ -112,8 +110,8 @@ chmod 600 "$KEY_FILE"
 chmod 644 "${KEY_FILE}.pub"
 
 clear_screen
-echo "SSH public key generated successfully!"
-echo "Public key path: ${KEY_FILE}.pub"
+print_box "Success" "SSH public key generated!
+Public key path: ${KEY_FILE}.pub"
 echo "Public key content:"
 echo "--------------------------------"
 cat "${KEY_FILE}.pub"

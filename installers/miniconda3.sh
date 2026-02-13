@@ -10,12 +10,12 @@ OS_TYPE="$(uname -s)"
 ARCH_TYPE="$(uname -m)"
 
 if [[ "$OS_TYPE" != "Darwin" && "$OS_TYPE" != "Linux" ]]; then
-    echo "Unsupported OS: $OS_TYPE"
+    log_error "Unsupported OS: $OS_TYPE"
     exit 1
 fi
 
 if [[ "$ARCH_TYPE" != "x86_64" && "$ARCH_TYPE" != "arm64" && "$ARCH_TYPE" != "aarch64" ]]; then
-    echo "Unsupported architecture: $ARCH_TYPE"
+    log_error "Unsupported architecture: $ARCH_TYPE"
     exit 1
 fi
 
@@ -28,18 +28,22 @@ fi
 BASE_URL="https://mirrors.nju.edu.cn/anaconda/miniconda/"
 INSTALLER="Miniconda3-latest-$OS-$ARCH_TYPE.sh"
 
-# Download and install Miniconda
-wget "${BASE_URL}${INSTALLER}" -O conda.sh
+log_info "Downloading Miniconda3..."
+wget "${BASE_URL}${INSTALLER}" -O conda.sh || {
+  log_error "Failed to download Miniconda3"
+  exit 1
+}
+
+log_info "Installing Miniconda3..."
 bash conda.sh -b -u -p "$HOME/.local/share/miniconda3" && rm conda.sh
 
-# Update shell config file
 RC_FILE=$(get_login_shell_rc_file)
 content='# miniconda3
 export PATH="$HOME/.local/share/miniconda3/bin:$PATH"
 source "$HOME/.local/share/miniconda3/bin/activate"'
-append_if_not_exists "$content" "$RC_FILE"
+append_if_not_exists "$RC_FILE" "$content"
 
-# Configure Conda mirror sources
+log_info "Configuring Conda mirror sources..."
 cat <<EOF > "$HOME/.condarc"
 channels:
   - defaults
@@ -53,7 +57,7 @@ custom_channels:
   pytorch: https://mirror.nju.edu.cn/anaconda/cloud
 EOF
 
-message="Install path: $HOME/.local/share/miniconda3
-Updated $RC_FILE
-Updated mirror sources: $HOME/.condarc"
-print 0 "$message"
+print_box "Success" "Miniconda3 installed!
+Install path: $HOME/.local/share/miniconda3
+Updated: $RC_FILE
+Mirror config: $HOME/.condarc"

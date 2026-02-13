@@ -8,7 +8,6 @@ source "$ROOT_DIR/lib/env.sh"
 
 DOCKER_DOWNLOAD_BASE="https://download.docker.com/linux/static/stable"
 
-# Map uname -m to Docker's architecture naming
 detect_arch() {
   local arch
   arch=$(uname -m)
@@ -20,13 +19,12 @@ detect_arch() {
     ppc64le)      echo "ppc64le" ;;
     s390x)        echo "s390x" ;;
     *)
-      echo "Unsupported architecture: $arch" >&2
+      log_error "Unsupported architecture: $arch"
       exit 1
       ;;
   esac
 }
 
-# Fetch available versions from the download page
 fetch_versions() {
   local arch=$1
   local url="${DOCKER_DOWNLOAD_BASE}/${arch}/"
@@ -36,59 +34,55 @@ fetch_versions() {
 }
 
 ARCH=$(detect_arch)
-echo "Detected architecture: $ARCH"
-echo ""
-echo "Fetching available Docker versions..."
+log_info "Detected architecture: $ARCH"
+
+# Stop existing Docker if running
+if command_exists docker && systemctl is-active --quiet docker 2>/dev/null; then
+  log_info "Stopping existing Docker services..."
+  sudo systemctl stop docker containerd 2>/dev/null || true
+fi
+
+log_info "Fetching available Docker versions..."
 
 VERSIONS=$(fetch_versions "$ARCH")
 if [[ -z "$VERSIONS" ]]; then
-  echo "Failed to fetch version list" >&2
+  log_error "Failed to fetch version list"
   exit 1
 fi
 
 LATEST=$(echo "$VERSIONS" | tail -n1)
 
-# Display recent versions
-echo ""
-echo "Available versions (latest 15):"
+log_info "Available versions (latest 15):"
 echo "$VERSIONS" | tail -n15 | nl -ba
-echo ""
 
 read -rp "Enter version to install [default: $LATEST]: " SELECTED_VERSION
 SELECTED_VERSION=${SELECTED_VERSION:-$LATEST}
 
-# Validate selection
 if ! echo "$VERSIONS" | grep -qx "$SELECTED_VERSION"; then
-  echo "Invalid version: $SELECTED_VERSION" >&2
+  log_error "Invalid version: $SELECTED_VERSION"
   exit 1
 fi
 
 DOWNLOAD_URL="${DOCKER_DOWNLOAD_BASE}/${ARCH}/docker-${SELECTED_VERSION}.tgz"
-echo ""
-echo "Download URL: $DOWNLOAD_URL"
-echo "Installing Docker $SELECTED_VERSION ($ARCH)..."
+log_info "Download URL: $DOWNLOAD_URL"
+log_info "Installing Docker $SELECTED_VERSION ($ARCH)..."
 
-# Download and extract
 TMPDIR=$(mktemp -d)
 trap 'rm -rf "$TMPDIR"' EXIT
 
 curl -fSL "$DOWNLOAD_URL" -o "$TMPDIR/docker.tgz"
 tar -xzf "$TMPDIR/docker.tgz" -C "$TMPDIR"
 
-# Install binaries
 sudo cp "$TMPDIR"/docker/* /usr/bin/
 
-# Create docker group if not exists
 if ! getent group docker >/dev/null 2>&1; then
   sudo groupadd docker
 fi
 
-# Add current user to docker group
 if ! id -nG "$USER" | grep -qw docker; then
   sudo usermod -aG docker "$USER"
 fi
 
-# Install systemd service if systemd is available
 if command_exists systemctl; then
   if [[ ! -f /etc/systemd/system/docker.service ]]; then
     sudo tee /etc/systemd/system/docker.service >/dev/null <<'EOF'
@@ -143,7 +137,7 @@ EOF
   sudo systemctl enable --now containerd docker
 fi
 
-print 0 "Docker $SELECTED_VERSION installed successfully!
+print_box "Success" "Docker $SELECTED_VERSION installed!
 Binary path: /usr/bin/docker
-Run 'docker version' to verify.
-Note: Log out and back in for docker group to take effect."
+Run 'docker version' to verify
+Note: Log out and back in for docker group to take effect"
