@@ -1,19 +1,30 @@
+# lib/env.sh
+
 [[ -n "${__ENV_SH__:-}" ]] && return
 __ENV_SH__=1
+
+source "$(dirname "${BASH_SOURCE[0]}")/log.sh"
 
 command_exists() {
   command -v "$1" >/dev/null 2>&1
 }
 
+check_sudo() {
+  if ! sudo -v 2>/dev/null; then
+    log_error "sudo privileges required"
+    return 1
+  fi
+  return 0
+}
+
 install_pkg() {
-  local pkg=$1
-  if [ -z "$pkg" ]; then
-    echo "Please provide a package name"
+  local pkg="$1"
+  if [[ -z "$pkg" ]]; then
+    log_error "Please provide a package name"
     return 1
   fi
 
-  # Detect distribution
-  if [ -f /etc/os-release ]; then
+  if [[ -f /etc/os-release ]]; then
     . /etc/os-release
     case "$ID" in
       ubuntu|debian)
@@ -29,41 +40,25 @@ install_pkg() {
         sudo pacman -S --noconfirm "$pkg"
         ;;
       *)
-        echo "Unsupported OS: $ID"
+        log_error "Unsupported OS: $ID"
         return 1
         ;;
     esac
   else
-    echo "Unable to detect OS type"
+    log_error "Unable to detect OS type"
     return 1
   fi
 }
 
 get_login_shell_rc_file() {
-  local shell_name rc_file
-
-  shell_name=$(basename "$SHELL")
+  local shell_name="$1"
+  [[ -z "$shell_name" ]] && shell_name=$(basename "$SHELL")
 
   case "$shell_name" in
-    bash)
-      rc_file="$HOME/.bashrc"
-      ;;
-    zsh)
-      rc_file="$HOME/.zshrc"
-      ;;
-    ksh)
-      rc_file="$HOME/.kshrc"
-      ;;
-    fish)
-      rc_file="$HOME/.config/fish/config.fish"
-      ;;
-    sh|dash)
-      rc_file="$HOME/.profile"
-      ;;
-    *)
-      rc_file="$HOME/.profile"
-      ;;
+    bash) echo "$HOME/.bashrc" ;;
+    zsh) echo "$HOME/.zshrc" ;;
+    ksh) echo "$HOME/.kshrc" ;;
+    fish) echo "$HOME/.config/fish/config.fish" ;;
+    *) echo "$HOME/.profile" ;;
   esac
-
-  echo "$rc_file"
 }
